@@ -1,1237 +1,1099 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DataLens AI — Ask Your Business Data in Plain English</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<style>
-/* ── RESET & TOKENS ─────────────────────────────────── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#09090f;
-  --bg2:#0f0f1a;
-  --bg3:#14141f;
-  --card:#16161f;
-  --card2:#1c1c2a;
-  --border:#ffffff0f;
-  --border2:#ffffff18;
-  --blue:#6366f1;
-  --blue2:#818cf8;
-  --blue-glow:#6366f133;
-  --green:#10b981;
-  --amber:#f59e0b;
-  --red:#ef4444;
-  --fg:#f1f1f8;
-  --fg2:#a0a0bc;
-  --fg3:#60607a;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'DM Sans',sans-serif;
-  --display:'Syne',sans-serif;
-}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Qurio is a secure desktop analytics assistant that lets businesses ask questions about their own database in plain English.">
+  <title>Qurio | Private AI Analytics for Business Data</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d12;
+      --panel: #11151d;
+      --panel-2: #171c26;
+      --text: #f6f8fb;
+      --muted: #a3acba;
+      --soft: #737d8c;
+      --line: rgba(255, 255, 255, .12);
+      --line-strong: rgba(255, 255, 255, .18);
+      --blue: #3b82f6;
+      --blue-2: #7dd3fc;
+      --green: #22c55e;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --shadow: 0 24px 80px rgba(0, 0, 0, .45);
+      --radius: 8px;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
-/* ── NOISE OVERLAY ──────────────────────────────────── */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size:200px;pointer-events:none;z-index:0;opacity:.5
-}
+    * {
+      box-sizing: border-box;
+    }
 
-/* ── NAV ─────────────────────────────────────────────── */
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 48px;
-  background:linear-gradient(180deg,#09090fdd 0%,transparent 100%);
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border)
-}
-.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px}
-.logo-icon{width:34px;height:34px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px}
-.nav-links{display:flex;gap:32px;font-size:14px;color:var(--fg2)}
-.nav-links a:hover{color:var(--fg)}
-.nav-cta{
-  background:var(--blue);color:#fff;font-size:13px;font-weight:500;
-  padding:9px 20px;border-radius:8px;transition:opacity .2s
-}
-.nav-cta:hover{opacity:.85}
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* ── HERO ─────────────────────────────────────────────── */
-.hero{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden
-}
-.hero-grid{
-  position:absolute;inset:0;
-  background-image:linear-gradient(rgba(99,102,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.06) 1px,transparent 1px);
-  background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 60% at 50% 50%,black 40%,transparent 100%)
-}
-.hero-glow{
-  position:absolute;top:20%;left:50%;transform:translateX(-50%);
-  width:600px;height:600px;border-radius:50%;
-  background:radial-gradient(circle,rgba(99,102,241,.15) 0%,transparent 70%);
-  pointer-events:none
-}
-.badge{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--blue-glow);border:1px solid rgba(99,102,241,.3);
-  color:var(--blue2);font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
-  padding:6px 14px;border-radius:100px;margin-bottom:28px
-}
-.pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
-h1{
-  font-family:var(--display);font-size:clamp(42px,7vw,88px);font-weight:800;line-height:1.05;
-  letter-spacing:-.03em;max-width:900px;margin-bottom:24px
-}
-h1 span{
-  background:linear-gradient(135deg,#a5b4fc 0%,#6366f1 40%,#818cf8 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
-}
-.hero-sub{font-size:18px;color:var(--fg2);max-width:560px;line-height:1.7;margin-bottom:40px}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-.btn-primary{
-  background:var(--blue);color:#fff;font-family:var(--sans);font-size:15px;font-weight:500;
-  padding:14px 32px;border-radius:10px;border:none;cursor:pointer;
-  display:inline-flex;align-items:center;gap:8px;
-  box-shadow:0 0 40px var(--blue-glow);transition:all .2s
-}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 60px rgba(99,102,241,.4)}
-.btn-ghost{
-  background:transparent;color:var(--fg2);font-family:var(--sans);font-size:15px;font-weight:500;
-  padding:14px 28px;border-radius:10px;border:1px solid var(--border2);cursor:pointer;
-  display:inline-flex;align-items:center;gap:8px;transition:all .2s
-}
-.btn-ghost:hover{border-color:var(--blue2);color:var(--fg)}
-.hero-demo-label{
-  margin-top:64px;font-size:12px;color:var(--fg3);letter-spacing:.08em;text-transform:uppercase;font-weight:500
-}
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        linear-gradient(180deg, rgba(15, 23, 42, .86), rgba(11, 13, 18, .96) 42%, #0b0d12),
+        radial-gradient(circle at 18% 18%, rgba(59, 130, 246, .14), transparent 34%),
+        radial-gradient(circle at 82% 22%, rgba(34, 197, 94, .08), transparent 28%),
+        var(--bg);
+      letter-spacing: 0;
+    }
 
-/* ── TYPEWRITER DEMO ─────────────────────────────────── */
-.typewriter-block{
-  margin-top:16px;background:var(--card);border:1px solid var(--border2);
-  border-radius:16px;padding:24px 28px;max-width:640px;text-align:left;
-  box-shadow:0 0 80px rgba(99,102,241,.08)
-}
-.tw-question{font-size:15px;color:var(--fg);margin-bottom:12px;min-height:24px}
-.tw-cursor{display:inline-block;width:2px;height:16px;background:var(--blue);animation:blink .8s step-end infinite;vertical-align:middle;margin-left:2px}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.tw-sql{
-  background:var(--bg);border:1px solid var(--border);border-radius:8px;
-  padding:12px 16px;font-family:var(--mono);font-size:12px;color:#94a3b8;
-  margin-bottom:12px;line-height:1.7;min-height:60px
-}
-.tw-sql .kw{color:#818cf8}.tw-sql .fn{color:#10b981}.tw-sql .val{color:#f59e0b}
-.tw-result-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px}
-.tw-result-table th{color:var(--fg3);font-weight:500;text-align:left;padding:4px 12px;border-bottom:1px solid var(--border)}
-.tw-result-table td{color:var(--fg2);padding:5px 12px;border-bottom:1px solid var(--border)}
-.tw-result-table tr:last-child td{border:none}
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-/* ── SECTION COMMONS ─────────────────────────────────── */
-section{position:relative;z-index:1}
-.section-pad{padding:100px 24px}
-.container{max-width:1100px;margin:0 auto}
-.section-label{font-size:12px;color:var(--blue2);letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:14px}
-.section-title{font-family:var(--display);font-size:clamp(28px,4vw,48px);font-weight:700;line-height:1.15;letter-spacing:-.02em;margin-bottom:16px}
-.section-sub{font-size:16px;color:var(--fg2);max-width:560px;line-height:1.7;margin-bottom:48px}
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:0 auto}
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* ── HOW IT WORKS ────────────────────────────────────── */
-.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
-.how-card{
-  background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;
-  position:relative;overflow:hidden;transition:border-color .3s
-}
-.how-card:hover{border-color:var(--border2)}
-.how-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:opacity .3s
-}
-.how-card:hover::before{opacity:1}
-.step-num{font-family:var(--display);font-size:48px;font-weight:800;color:var(--blue-glow);line-height:1;margin-bottom:16px;color:rgba(99,102,241,.2)}
-.step-icon{font-size:28px;margin-bottom:12px}
-.how-card h3{font-family:var(--display);font-size:17px;font-weight:700;margin-bottom:8px}
-.how-card p{font-size:14px;color:var(--fg2);line-height:1.6}
+    .shell {
+      width: min(1140px, calc(100% - 40px));
+      margin: 0 auto;
+    }
 
-/* ── DEMO DATA SECTION ───────────────────────────────── */
-.demo-tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap}
-.tab{
-  padding:8px 20px;border-radius:8px;border:1px solid var(--border2);
-  font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;background:transparent;color:var(--fg2)
-}
-.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
-.tab:hover:not(.active){border-color:var(--border2);color:var(--fg)}
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      right: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      background: rgba(11, 13, 18, .82);
+      backdrop-filter: blur(18px);
+    }
 
-.data-panel{display:none}
-.data-panel.active{display:block}
+    .nav {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
 
-.dataset-info{
-  display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px
-}
-@media(max-width:640px){.dataset-info{grid-template-columns:1fr}}
-.dataset-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
-.dataset-card h4{font-family:var(--display);font-size:15px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.dataset-card p{font-size:13px;color:var(--fg2);line-height:1.6}
-.tag{
-  display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;
-  background:rgba(99,102,241,.15);color:var(--blue2);margin:2px
-}
-.tag.green{background:rgba(16,185,129,.12);color:#34d399}
-.tag.amber{background:rgba(245,158,11,.12);color:#fbbf24}
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
 
-.sql-box{
-  background:var(--bg2);border:1px solid var(--border2);border-radius:12px;overflow:hidden
-}
-.sql-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;border-bottom:1px solid var(--border);background:var(--card)
-}
-.sql-header-left{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--fg3)}
-.file-dot{width:8px;height:8px;border-radius:50%}
-.copy-btn{
-  font-size:12px;color:var(--blue2);background:transparent;border:1px solid rgba(99,102,241,.25);
-  padding:4px 12px;border-radius:6px;cursor:pointer;font-family:var(--sans);transition:all .2s
-}
-.copy-btn:hover{background:var(--blue-glow)}
-.sql-body{
-  padding:20px;font-family:var(--mono);font-size:12px;line-height:1.9;
-  color:#94a3b8;overflow-x:auto;white-space:pre;max-height:380px;overflow-y:auto
-}
-.sql-body::-webkit-scrollbar{width:4px;height:4px}
-.sql-body::-webkit-scrollbar-track{background:transparent}
-.sql-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-.kw{color:#818cf8;font-weight:500}
-.fn{color:#10b981}
-.str{color:#f59e0b}
-.num{color:#f472b6}
-.cm{color:#4a4a6a;font-style:italic}
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+      box-shadow: 0 12px 28px rgba(59, 130, 246, .26);
+      font-weight: 800;
+    }
 
-/* ── SETUP GUIDE ─────────────────────────────────────── */
-.steps-grid{display:flex;flex-direction:column;gap:0}
-.step-row{display:grid;grid-template-columns:64px 1fr;gap:0;position:relative}
-.step-row:not(:last-child)::before{
-  content:'';position:absolute;left:32px;top:64px;bottom:0;width:1px;
-  background:linear-gradient(180deg,var(--blue) 0%,var(--border) 100%)
-}
-.step-circle{
-  width:48px;height:48px;border-radius:50%;border:2px solid var(--blue);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--display);font-weight:700;font-size:16px;color:var(--blue);
-  background:var(--bg);flex-shrink:0;position:relative;z-index:1;margin-top:8px
-}
-.step-content{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px 28px;margin:8px 0 24px 24px}
-.step-content h3{font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:6px}
-.step-content p{font-size:14px;color:var(--fg2);line-height:1.7;margin-bottom:14px}
-.step-content p:last-child{margin-bottom:0}
-.inline-code{
-  font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--border2);
-  padding:2px 7px;border-radius:4px;color:#a5b4fc
-}
-.warning-box{
-  background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);
-  border-radius:8px;padding:12px 16px;font-size:13px;color:#fbbf24;
-  display:flex;gap:10px;align-items:flex-start;margin-top:12px
-}
-.info-box{
-  background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2);
-  border-radius:8px;padding:12px 16px;font-size:13px;color:var(--blue2);
-  display:flex;gap:10px;align-items:flex-start;margin-top:12px
-}
-.success-box{
-  background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);
-  border-radius:8px;padding:12px 16px;font-size:13px;color:#34d399;
-  display:flex;gap:10px;align-items:flex-start;margin-top:12px
-}
-.mini-sql{
-  font-family:var(--mono);font-size:12px;background:var(--bg2);border:1px solid var(--border);
-  border-radius:8px;padding:14px 16px;color:#94a3b8;line-height:1.8;margin-top:12px;white-space:pre
-}
-.os-tabs{display:flex;gap:6px;margin-bottom:12px}
-.os-tab{
-  font-size:12px;padding:5px 14px;border-radius:6px;border:1px solid var(--border2);
-  cursor:pointer;color:var(--fg3);background:transparent;transition:all .2s
-}
-.os-tab.active{background:var(--card2);color:var(--fg);border-color:var(--border2)}
-.os-content{display:none}.os-content.active{display:block}
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
 
-/* ── CONNECT SECTION ─────────────────────────────────── */
-.connect-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
-@media(max-width:768px){.connect-grid{grid-template-columns:1fr}}
-.connect-fields{display:flex;flex-direction:column;gap:14px}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.field-group{display:flex;flex-direction:column;gap:6px}
-.field-label{font-size:12px;color:var(--fg3);font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-.field-mock{
-  background:var(--card);border:1px solid var(--border2);border-radius:8px;
-  padding:11px 14px;font-family:var(--mono);font-size:13px;color:var(--fg2);
-  display:flex;align-items:center;gap:8px
-}
-.field-mock .icon{font-size:14px;color:var(--fg3)}
-.field-mock .val{color:var(--fg)}
-.field-mock.highlight{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-glow)}
+    .navlinks a:hover {
+      color: var(--text);
+    }
 
-.check-list{display:flex;flex-direction:column;gap:12px}
-.check-item{display:flex;align-items:flex-start;gap:12px;font-size:14px;color:var(--fg2)}
-.check-icon{
-  width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,.12);
-  display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--green);flex-shrink:0;margin-top:1px
-}
+    .nav-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 14px;
+    }
 
-/* ── SAMPLE QUERIES ──────────────────────────────────── */
-.query-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.query-card{
-  background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;
-  cursor:pointer;transition:all .2s;position:relative;overflow:hidden
-}
-.query-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 8px 40px rgba(99,102,241,.1)}
-.query-card::after{
-  content:'↗';position:absolute;top:16px;right:16px;font-size:14px;color:var(--fg3);
-  transition:color .2s
-}
-.query-card:hover::after{color:var(--blue)}
-.query-industry{font-size:11px;color:var(--fg3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
-.query-text{font-size:15px;color:var(--fg);line-height:1.5;padding-right:24px}
-.query-tag{font-size:11px;color:var(--blue2);margin-top:10px}
+    .hero {
+      position: relative;
+      min-height: 96vh;
+      padding: 132px 0 72px;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
 
-/* ── FOOTER ──────────────────────────────────────────── */
-footer{
-  text-align:center;padding:48px 24px;border-top:1px solid var(--border);
-  color:var(--fg3);font-size:13px
-}
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 72px 0 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .045) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, .75), transparent 78%);
+      pointer-events: none;
+    }
 
-/* ── DOWNLOAD BAR ────────────────────────────────────── */
-.download-bar{
-  background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(99,102,241,.03));
-  border:1px solid rgba(99,102,241,.2);border-radius:16px;
-  padding:28px 32px;display:flex;align-items:center;justify-content:space-between;
-  margin-top:32px;flex-wrap:wrap;gap:16px
-}
-.download-bar h3{font-family:var(--display);font-size:18px;font-weight:700;margin-bottom:4px}
-.download-bar p{font-size:13px;color:var(--fg2)}
-.dl-btns{display:flex;gap:10px;flex-wrap:wrap}
-.dl-btn{
-  display:inline-flex;align-items:center;gap:8px;
-  background:var(--card2);border:1px solid var(--border2);color:var(--fg);
-  font-size:13px;font-weight:500;padding:9px 18px;border-radius:8px;cursor:pointer;transition:all .2s
-}
-.dl-btn:hover{border-color:var(--blue2);color:var(--blue2)}
-.dl-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
-.dl-btn.primary:hover{opacity:.9}
+    .hero-layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 44px;
+      align-items: center;
+      justify-items: center;
+      text-align: center;
+    }
 
-/* ── ANIMATIONS ──────────────────────────────────────── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-.fade-up{animation:fadeUp .7s ease both}
-.delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border: 1px solid rgba(125, 211, 252, .28);
+      border-radius: 999px;
+      background: rgba(14, 165, 233, .08);
+      color: #bae6fd;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
 
-@media(max-width:768px){
-  nav{padding:16px 20px}
-  .nav-links{display:none}
-  h1{font-size:38px}
-  .section-pad{padding:64px 16px}
-}
-</style>
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 5px rgba(34, 197, 94, .12);
+    }
+
+    h1 {
+      max-width: 920px;
+      margin: 22px auto 0;
+      font-size: clamp(44px, 7vw, 84px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      margin: 24px auto 0;
+      color: #cbd5e1;
+      font-size: clamp(17px, 2vw, 20px);
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      margin-top: 34px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #0891b2);
+      box-shadow: 0 18px 42px rgba(37, 99, 235, .28);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      border-color: var(--line-strong);
+      background: rgba(255, 255, 255, .05);
+    }
+
+    .hero-note {
+      margin-top: 14px;
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .product-visual {
+      width: min(980px, 100%);
+      text-align: left;
+      border: 1px solid var(--line-strong);
+      background: rgba(17, 21, 29, .86);
+      box-shadow: var(--shadow);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .window-bar {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .window-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .window-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #475569;
+    }
+
+    .window-dots span:nth-child(1) {
+      background: #ef4444;
+    }
+
+    .window-dots span:nth-child(2) {
+      background: #f59e0b;
+    }
+
+    .window-dots span:nth-child(3) {
+      background: #22c55e;
+    }
+
+    .window-title {
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .app-preview {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      min-height: 420px;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(0, 0, 0, .18);
+      padding: 18px;
+    }
+
+    .side-title {
+      font-size: 12px;
+      color: var(--soft);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .side-item {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 8px;
+      padding: 0 11px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .side-item.active {
+      background: rgba(59, 130, 246, .14);
+      color: #dbeafe;
+    }
+
+    .mini-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      background: rgba(148, 163, 184, .35);
+    }
+
+    .side-item.active .mini-icon {
+      background: var(--blue);
+    }
+
+    .main-preview {
+      padding: 24px;
+    }
+
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+
+    .preview-head h2 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .preview-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .secure-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(34, 197, 94, .25);
+      background: rgba(34, 197, 94, .08);
+      color: #bbf7d0;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .035);
+      padding: 14px;
+    }
+
+    .metric span {
+      color: var(--soft);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 7px;
+      font-size: 20px;
+    }
+
+    .query-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, .18);
+    }
+
+    .query-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .query-input::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--blue-2);
+      box-shadow: 0 0 0 5px rgba(125, 211, 252, .1);
+      flex: 0 0 auto;
+    }
+
+    .result-area {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .sql {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #c4b5fd;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(15, 23, 42, .66);
+      overflow: hidden;
+    }
+
+    .chart {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: rgba(15, 23, 42, .42);
+      display: grid;
+      align-items: end;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 9px;
+      min-height: 156px;
+    }
+
+    .bar {
+      border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg, #7dd3fc, #2563eb);
+      min-height: 28px;
+    }
+
+    .bar:nth-child(2) {
+      height: 78%;
+      background: linear-gradient(180deg, #86efac, #16a34a);
+    }
+
+    .bar:nth-child(3) {
+      height: 52%;
+    }
+
+    .bar:nth-child(4) {
+      height: 92%;
+      background: linear-gradient(180deg, #fde68a, #f59e0b);
+    }
+
+    .bar:nth-child(5) {
+      height: 64%;
+    }
+
+    .bar:nth-child(6) {
+      height: 84%;
+      background: linear-gradient(180deg, #86efac, #16a34a);
+    }
+
+    section {
+      padding: 86px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .section-kicker {
+      color: var(--blue-2);
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      max-width: 740px;
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .section-lead {
+      max-width: 680px;
+      color: var(--muted);
+      margin: 16px 0 0;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 34px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .035);
+      padding: 22px;
+    }
+
+    .card h3 {
+      margin: 0 0 9px;
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .card-badge {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 16px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 800;
+      background: #1d4ed8;
+    }
+
+    .card:nth-child(2) .card-badge {
+      background: #047857;
+    }
+
+    .card:nth-child(3) .card-badge {
+      background: #b45309;
+    }
+
+    .download-section {
+      background: #0f141d;
+    }
+
+    .download-panel {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 28px;
+      align-items: stretch;
+      margin-top: 34px;
+    }
+
+    .download-copy,
+    .download-card {
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .04);
+      padding: 26px;
+    }
+
+    .download-copy h3,
+    .download-card h3 {
+      margin: 0 0 12px;
+      font-size: 21px;
+    }
+
+    .download-list {
+      list-style: none;
+      padding: 0;
+      margin: 22px 0 0;
+      display: grid;
+      gap: 13px;
+    }
+
+    .download-list li {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .check {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      background: rgba(34, 197, 94, .12);
+      color: #86efac;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .download-card {
+      background: linear-gradient(180deg, rgba(59, 130, 246, .15), rgba(255, 255, 255, .035));
+    }
+
+    .file-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin: 18px 0;
+      background: rgba(0, 0, 0, .16);
+    }
+
+    .file-name {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .file-meta {
+      margin-top: 5px;
+      color: var(--soft);
+      font-size: 12px;
+    }
+
+    .download-card .btn {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .tiny {
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.6;
+      margin: 14px 0 0;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 34px;
+      counter-reset: step;
+    }
+
+    .step {
+      counter-increment: step;
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .035);
+      padding: 20px;
+      min-height: 178px;
+    }
+
+    .step::before {
+      content: "0" counter(step);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, .14);
+      color: #bfdbfe;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .security-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 34px;
+    }
+
+    .security-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 24px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .security-card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .security-card p {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+
+    .cta {
+      text-align: center;
+      padding: 86px 0;
+    }
+
+    .cta h2 {
+      margin: 0 auto;
+      max-width: 760px;
+      font-size: clamp(32px, 5vw, 54px);
+      line-height: 1.1;
+    }
+
+    .cta p {
+      max-width: 640px;
+      margin: 18px auto 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 17px;
+    }
+
+    footer {
+      padding: 34px 0;
+      color: var(--soft);
+      font-size: 13px;
+    }
+
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .toast {
+      position: fixed;
+      z-index: 40;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(80px);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--line-strong);
+      color: var(--text);
+      background: #111827;
+      box-shadow: var(--shadow);
+      transition: transform .24s ease;
+      font-size: 14px;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 920px) {
+      .navlinks {
+        display: none;
+      }
+
+      .app-preview {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .metric-grid,
+      .grid-3,
+      .steps,
+      .security-grid,
+      .download-panel,
+      .result-area {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 28px, 1140px);
+      }
+
+      .nav {
+        height: 64px;
+      }
+
+      .nav-download {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 108px;
+      }
+
+      .product-visual {
+        border-radius: 10px;
+      }
+
+      .main-preview {
+        padding: 16px;
+      }
+
+      .preview-head {
+        flex-direction: column;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      section {
+        padding: 64px 0;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<!-- ── NAV ──────────────────────────────────────────── -->
-<nav>
-  <div class="logo">
-    <img src="data:image/jpeg;base64,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" style="width:34px;height:34px;border-radius:8px;" alt="DataLens AI logo">
-    DataLens AI
-  </div>
-  <div class="nav-links">
-    <a href="#how-it-works">How it works</a>
-    <a href="#demo-data">Demo data</a>
-    <a href="#setup-guide">Setup guide</a>
-    <a href="#connect">Connect</a>
-  </div>
-  <a href="https://github.com/BlackDevil9678/landing/releases/download/v1.0.0/Querio.Setup.1.0.0.exe" download="Querio.Setup.1.0.0.exe" class="nav-cta">Try the Demo →</a>
-</nav>
-
-<!-- ── HERO ─────────────────────────────────────────── -->
-<section class="hero">
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
-
-  <div class="badge fade-up">
-    <span class="pulse"></span>
-    Live Demo Available
-  </div>
-
-  <h1 class="fade-up delay-1">
-    Ask your business data<br/>in <span>plain English</span>
-  </h1>
-
-  <p class="hero-sub fade-up delay-2">
-    DataLens AI connects to your local MySQL or PostgreSQL database and answers your business questions instantly — no SQL knowledge needed.
-  </p>
-
-  <div class="hero-btns fade-up delay-3">
-    <button class="btn-primary" onclick="const a=document.createElement('a');a.href='https://github.com/BlackDevil9678/landing/releases/download/v1.0.0/DataLens.AI.Setup.1.0.0.exe';a.download='DataLens AI Setup 1.0.0.exe';a.click()">
-      ⚡ Try the demo
-    </button>
-    <button class="btn-ghost" onclick="document.getElementById('demo-data').scrollIntoView({behavior:'smooth'})">
-      📦 Download sample data
-    </button>
-  </div>
-
-  <div class="hero-demo-label fade-up">See it in action</div>
-
-  <div class="typewriter-block fade-up">
-    <div class="tw-question" id="tw-q">Which product line had the highest revenue last quarter?<span class="tw-cursor"></span></div>
-    <div class="tw-sql" id="tw-sql">
-<span class="kw">SELECT</span> product_line, <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> total_revenue
-<span class="kw">FROM</span> sales_orders
-<span class="kw">WHERE</span> order_date >= <span class="fn">DATE_SUB</span>(<span class="fn">NOW</span>(), <span class="kw">INTERVAL</span> <span class="num">90</span> <span class="kw">DAY</span>)
-<span class="kw">GROUP BY</span> product_line
-<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC LIMIT</span> <span class="num">5</span></div>
-    <table class="tw-result-table" id="tw-result">
-      <thead><tr><th>Product Line</th><th>Total Revenue</th></tr></thead>
-      <tbody>
-        <tr><td>Heavy Machinery</td><td>₹ 84,20,000</td></tr>
-        <tr><td>Auto Components</td><td>₹ 61,75,500</td></tr>
-        <tr><td>Industrial Tools</td><td>₹ 38,90,200</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<div class="divider" style="max-width:1100px"></div>
-
-<!-- ── HOW IT WORKS ──────────────────────────────────── -->
-<section class="section-pad" id="how-it-works">
-  <div class="container">
-    <div class="section-label">How it works</div>
-    <div class="section-title">Three steps. Zero SQL expertise.</div>
-
-    <div class="how-grid">
-      <div class="how-card">
-        <div class="step-num">01</div>
-        <div class="step-icon">🗄️</div>
-        <h3>Load the demo data</h3>
-        <p>Copy and paste the provided SQL script into your database tool. Takes about 2 minutes. No coding needed.</p>
+  <!-- Demo download uses the latest GitHub Release asset. Upload an asset named Qurio-Demo-Setup.exe. -->
+  <div class="topbar">
+    <div class="shell nav">
+      <a class="brand" href="#top" aria-label="Qurio home">
+        <span class="brand-mark">Q</span>
+        <span>Qurio</span>
+      </a>
+      <div class="navlinks" aria-label="Main navigation">
+        <a href="#product">Product</a>
+        <a href="#download">Download</a>
+        <a href="#setup">Setup</a>
+        <a href="#security">Security</a>
       </div>
-      <div class="how-card">
-        <div class="step-num">02</div>
-        <div class="step-icon">🔌</div>
-        <h3>Connect the software</h3>
-        <p>Open DataLens AI, enter your local database details (host, port, name) on the setup screen, and click Connect.</p>
-      </div>
-      <div class="how-card">
-        <div class="step-num">03</div>
-        <div class="step-icon">💬</div>
-        <h3>Ask questions freely</h3>
-        <p>Type any business question in plain English. DataLens AI translates it to SQL and shows you the results instantly.</p>
-      </div>
-      <div class="how-card">
-        <div class="step-num">04</div>
-        <div class="step-icon">🔒</div>
-        <h3>Your data stays local</h3>
-        <p>The demo uses fake data. When you're ready, connect your real database — everything runs on your own machine.</p>
-      </div>
+      <a class="nav-download" href="https://github.com/BlackDevil9678/landing/releases/latest/download/Qurio-Demo-Setup.exe" data-download>Download Demo</a>
     </div>
   </div>
-</section>
 
-<div class="divider" style="max-width:1100px"></div>
-
-<!-- ── DEMO DATA ─────────────────────────────────────── -->
-<section class="section-pad" id="demo-data">
-  <div class="container">
-    <div class="section-label">Sample datasets</div>
-    <div class="section-title">Realistic demo data included</div>
-    <p class="section-sub">Choose a dataset that matches your industry. All data is completely fictional — safe to share and load on any machine.</p>
-
-    <div class="demo-tabs">
-      <button class="tab active" onclick="switchTab('mfg', this)">🏭 Manufacturing</button>
-      <button class="tab" onclick="switchTab('b2b', this)">🤝 B2B Sales</button>
-      <button class="tab" onclick="switchTab('inv', this)">📦 Inventory</button>
-    </div>
-
-    <!-- MANUFACTURING -->
-    <div class="data-panel active" id="panel-mfg">
-      <div class="dataset-info">
-        <div class="dataset-card">
-          <h4>📊 What's included</h4>
-          <p style="margin-top:8px">
-            <span class="tag green">production_orders</span>
-            <span class="tag green">product_lines</span>
-            <span class="tag green">machines</span>
-            <span class="tag green">downtime_logs</span>
-            <span class="tag green">quality_checks</span>
+  <main id="top">
+    <section class="hero">
+      <div class="shell hero-layout">
+        <div>
+          <div class="eyebrow"><span class="status-dot"></span> Windows desktop demo available</div>
+          <h1>Qurio: Private AI Analytics for Business Data</h1>
+          <p class="hero-copy">
+            Qurio lets your team ask questions in plain English and get SQL-backed insights from MySQL, PostgreSQL, SQLite, CSV, or Excel data. Built as Qurio Desktop software for client-specific deployments.
           </p>
-          <p style="margin-top:12px;font-size:13px;color:var(--fg2)">~500 rows of realistic factory operations data across 4 product lines and 8 machines.</p>
-        </div>
-        <div class="dataset-card">
-          <h4>💡 Try asking</h4>
-          <p style="margin-top:8px;font-size:13px;color:var(--fg2)">
-            "Which machine had the most downtime this month?"<br/><br/>
-            "Show me the defect rate per product line"<br/><br/>
-            "What is our total production output this week?"
-          </p>
-        </div>
-      </div>
-
-      <div class="sql-box">
-        <div class="sql-header">
-          <div class="sql-header-left">
-            <div class="file-dot" style="background:#ef4444"></div>
-            <div class="file-dot" style="background:#f59e0b"></div>
-            <div class="file-dot" style="background:#10b981"></div>
-            &nbsp; manufacturing_demo.sql
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://github.com/BlackDevil9678/landing/releases/latest/download/Qurio-Demo-Setup.exe" data-download>Download Windows Demo</a>
+            <a class="btn btn-secondary" href="mailto:hello@example.com?subject=Qurio%20client%20demo">Request Client Build</a>
           </div>
-          <button class="copy-btn" onclick="copySQL('mfg-sql')">Copy SQL</button>
+          <p class="hero-note">Demo installer for evaluation. Client builds can be customized with company name, logo, database, and AI key.</p>
         </div>
-        <div class="sql-body" id="mfg-sql"><span class="cm">-- ═══════════════════════════════════════════════════════
--- DataLens AI — Manufacturing Demo Data
--- Paste this entire script into MySQL Workbench or DBeaver
--- ═══════════════════════════════════════════════════════</span>
 
-<span class="cm">-- Create a fresh demo database</span>
-<span class="kw">CREATE DATABASE IF NOT EXISTS</span> datalens_manufacturing_demo;
-<span class="kw">USE</span> datalens_manufacturing_demo;
-
-<span class="cm">-- ── Product Lines ────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> product_lines (
-  id          <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  name        <span class="fn">VARCHAR</span>(<span class="num">100</span>),
-  category    <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  unit_cost   <span class="fn">DECIMAL</span>(<span class="num">10,2</span>),
-  target_qty  <span class="fn">INT</span>
-);
-
-<span class="kw">INSERT INTO</span> product_lines (name, category, unit_cost, target_qty) <span class="kw">VALUES</span>
-(<span class="str">'Heavy Machinery Parts'</span>,  <span class="str">'Mechanical'</span>,  <span class="num">4200.00</span>, <span class="num">200</span>),
-(<span class="str">'Auto Components'</span>,         <span class="str">'Automotive'</span>,  <span class="num">1800.00</span>, <span class="num">500</span>),
-(<span class="str">'Industrial Fasteners'</span>,    <span class="str">'Hardware'</span>,    <span class="num">120.00</span>,  <span class="num">5000</span>),
-(<span class="str">'Precision Instruments'</span>,   <span class="str">'Electronics'</span>, <span class="num">8500.00</span>, <span class="num">80</span>);
-
-<span class="cm">-- ── Machines ─────────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> machines (
-  id           <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  machine_name <span class="fn">VARCHAR</span>(<span class="num">80</span>),
-  type         <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  location     <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  installed_on <span class="fn">DATE</span>
-);
-
-<span class="kw">INSERT INTO</span> machines (machine_name, type, location, installed_on) <span class="kw">VALUES</span>
-(<span class="str">'CNC-Alpha'</span>,    <span class="str">'CNC Lathe'</span>,      <span class="str">'Bay A'</span>, <span class="str">'2019-03-15'</span>),
-(<span class="str">'CNC-Beta'</span>,     <span class="str">'CNC Lathe'</span>,      <span class="str">'Bay A'</span>, <span class="str">'2020-07-10'</span>),
-(<span class="str">'Press-01'</span>,     <span class="str">'Hydraulic Press'</span>,<span class="str">'Bay B'</span>, <span class="str">'2018-11-01'</span>),
-(<span class="str">'Press-02'</span>,     <span class="str">'Hydraulic Press'</span>,<span class="str">'Bay B'</span>, <span class="str">'2021-01-20'</span>),
-(<span class="str">'Weld-01'</span>,      <span class="str">'Welding Robot'</span>,  <span class="str">'Bay C'</span>, <span class="str">'2022-05-30'</span>),
-(<span class="str">'Grind-01'</span>,     <span class="str">'Surface Grinder'</span>,<span class="str">'Bay D'</span>, <span class="str">'2017-09-12'</span>),
-(<span class="str">'Inspect-CAM'</span>,  <span class="str">'CMM Machine'</span>,    <span class="str">'QC Lab'</span>,<span class="str">'2023-02-14'</span>),
-(<span class="str">'Assembly-Line'</span>,<span class="str">'Assembly Robot'</span>, <span class="str">'Bay E'</span>, <span class="str">'2020-10-05'</span>);
-
-<span class="cm">-- ── Production Orders ─────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> production_orders (
-  id              <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  order_code      <span class="fn">VARCHAR</span>(<span class="num">20</span>) <span class="kw">UNIQUE</span>,
-  product_line_id <span class="fn">INT</span> <span class="kw">REFERENCES</span> product_lines(id),
-  machine_id      <span class="fn">INT</span> <span class="kw">REFERENCES</span> machines(id),
-  quantity_target <span class="fn">INT</span>,
-  quantity_actual <span class="fn">INT</span>,
-  status          <span class="fn">ENUM</span>(<span class="str">'Completed'</span>,<span class="str">'In Progress'</span>,<span class="str">'Halted'</span>),
-  started_at      <span class="fn">DATETIME</span>,
-  completed_at    <span class="fn">DATETIME</span>,
-  shift           <span class="fn">ENUM</span>(<span class="str">'Morning'</span>,<span class="str">'Afternoon'</span>,<span class="str">'Night'</span>)
-);
-
-<span class="kw">INSERT INTO</span> production_orders
-  (order_code,product_line_id,machine_id,quantity_target,quantity_actual,status,started_at,completed_at,shift)
-<span class="kw">VALUES</span>
-(<span class="str">'ORD-2024-001'</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="num">180</span>,<span class="num">175</span>,<span class="str">'Completed'</span>,  <span class="str">'2024-01-08 06:00'</span>,<span class="str">'2024-01-08 14:00'</span>,<span class="str">'Morning'</span>),
-(<span class="str">'ORD-2024-002'</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">480</span>,<span class="num">490</span>,<span class="str">'Completed'</span>,  <span class="str">'2024-01-09 14:00'</span>,<span class="str">'2024-01-09 22:00'</span>,<span class="str">'Afternoon'</span>),
-(<span class="str">'ORD-2024-003'</span>,<span class="num">3</span>,<span class="num">3</span>,<span class="num">4800</span>,<span class="num">4650</span>,<span class="str">'Completed'</span>, <span class="str">'2024-01-10 22:00'</span>,<span class="str">'2024-01-11 06:00'</span>,<span class="str">'Night'</span>),
-(<span class="str">'ORD-2024-004'</span>,<span class="num">4</span>,<span class="num">7</span>,<span class="num">75</span>,<span class="num">72</span>,<span class="str">'Completed'</span>,   <span class="str">'2024-01-12 06:00'</span>,<span class="str">'2024-01-12 14:00'</span>,<span class="str">'Morning'</span>),
-(<span class="str">'ORD-2024-005'</span>,<span class="num">1</span>,<span class="num">5</span>,<span class="num">200</span>,<span class="num">190</span>,<span class="str">'Completed'</span>,  <span class="str">'2024-01-15 06:00'</span>,<span class="str">'2024-01-15 14:00'</span>,<span class="str">'Morning'</span>),
-(<span class="str">'ORD-2024-006'</span>,<span class="num">2</span>,<span class="num">1</span>,<span class="num">500</span>,<span class="num">500</span>,<span class="str">'Completed'</span>,  <span class="str">'2024-02-01 14:00'</span>,<span class="str">'2024-02-01 22:00'</span>,<span class="str">'Afternoon'</span>),
-(<span class="str">'ORD-2024-007'</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5000</span>,<span class="num">4800</span>,<span class="str">'Completed'</span>, <span class="str">'2024-02-05 22:00'</span>,<span class="str">'2024-02-06 06:00'</span>,<span class="str">'Night'</span>),
-(<span class="str">'ORD-2024-008'</span>,<span class="num">4</span>,<span class="num">7</span>,<span class="num">80</span>,<span class="num">80</span>,<span class="str">'Completed'</span>,   <span class="str">'2024-02-10 06:00'</span>,<span class="str">'2024-02-10 14:00'</span>,<span class="str">'Morning'</span>),
-(<span class="str">'ORD-2024-009'</span>,<span class="num">2</span>,<span class="num">8</span>,<span class="num">450</span>,<span class="num">430</span>,<span class="str">'Completed'</span>,  <span class="str">'2024-03-01 06:00'</span>,<span class="str">'2024-03-01 14:00'</span>,<span class="str">'Morning'</span>),
-(<span class="str">'ORD-2024-010'</span>,<span class="num">1</span>,<span class="num">6</span>,<span class="num">195</span>,<span class="num">0</span>,<span class="str">'In Progress'</span>,<span class="str">'2024-04-02 06:00'</span>,<span class="kw">NULL</span>,<span class="str">'Morning'</span>);
-
-<span class="cm">-- ── Downtime Logs ─────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> downtime_logs (
-  id          <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  machine_id  <span class="fn">INT</span> <span class="kw">REFERENCES</span> machines(id),
-  reason      <span class="fn">VARCHAR</span>(<span class="num">120</span>),
-  started_at  <span class="fn">DATETIME</span>,
-  ended_at    <span class="fn">DATETIME</span>,
-  hours_lost  <span class="fn">DECIMAL</span>(<span class="num">5,2</span>)
-);
-
-<span class="kw">INSERT INTO</span> downtime_logs (machine_id,reason,started_at,ended_at,hours_lost) <span class="kw">VALUES</span>
-(<span class="num">1</span>,<span class="str">'Spindle bearing failure'</span>,    <span class="str">'2024-01-20 08:00'</span>,<span class="str">'2024-01-20 13:30'</span>,<span class="num">5.50</span>),
-(<span class="num">3</span>,<span class="str">'Hydraulic fluid leak'</span>,       <span class="str">'2024-01-25 10:00'</span>,<span class="str">'2024-01-25 14:00'</span>,<span class="num">4.00</span>),
-(<span class="num">6</span>,<span class="str">'Wheel dressing required'</span>,    <span class="str">'2024-02-03 07:00'</span>,<span class="str">'2024-02-03 09:00'</span>,<span class="num">2.00</span>),
-(<span class="num">1</span>,<span class="str">'Tool change & calibration'</span>,  <span class="str">'2024-02-14 11:00'</span>,<span class="str">'2024-02-14 13:00'</span>,<span class="num">2.00</span>),
-(<span class="num">5</span>,<span class="str">'Wire electrode breakage'</span>,    <span class="str">'2024-02-20 09:30'</span>,<span class="str">'2024-02-20 12:00'</span>,<span class="num">2.50</span>),
-(<span class="num">3</span>,<span class="str">'Scheduled PM service'</span>,       <span class="str">'2024-03-01 00:00'</span>,<span class="str">'2024-03-01 06:00'</span>,<span class="num">6.00</span>),
-(<span class="num">8</span>,<span class="str">'Robot arm sensor fault'</span>,     <span class="str">'2024-03-10 14:00'</span>,<span class="str">'2024-03-10 16:30'</span>,<span class="num">2.50</span>),
-(<span class="num">2</span>,<span class="str">'Coolant system blockage'</span>,    <span class="str">'2024-03-18 08:00'</span>,<span class="str">'2024-03-18 11:00'</span>,<span class="num">3.00</span>);
-
-<span class="cm">-- ── Quality Checks ─────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> quality_checks (
-  id              <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  order_id        <span class="fn">INT</span> <span class="kw">REFERENCES</span> production_orders(id),
-  inspector       <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  total_inspected <span class="fn">INT</span>,
-  defects_found   <span class="fn">INT</span>,
-  result          <span class="fn">ENUM</span>(<span class="str">'Pass'</span>,<span class="str">'Fail'</span>,<span class="str">'Conditional'</span>),
-  checked_at      <span class="fn">DATETIME</span>
-);
-
-<span class="kw">INSERT INTO</span> quality_checks
-  (order_id,inspector,total_inspected,defects_found,result,checked_at)
-<span class="kw">VALUES</span>
-(<span class="num">1</span>,<span class="str">'Rajan Mehta'</span>,    <span class="num">175</span>,<span class="num">3</span>,<span class="str">'Pass'</span>,        <span class="str">'2024-01-08 15:00'</span>),
-(<span class="num">2</span>,<span class="str">'Priya Nair'</span>,     <span class="num">490</span>,<span class="num">8</span>,<span class="str">'Pass'</span>,        <span class="str">'2024-01-09 23:00'</span>),
-(<span class="num">3</span>,<span class="str">'Rajan Mehta'</span>,   <span class="num">4650</span>,<span class="num">92</span>,<span class="str">'Conditional'</span>,<span class="str">'2024-01-11 07:00'</span>),
-(<span class="num">4</span>,<span class="str">'Anup Das'</span>,        <span class="num">72</span>,<span class="num">0</span>,<span class="str">'Pass'</span>,        <span class="str">'2024-01-12 15:00'</span>),
-(<span class="num">5</span>,<span class="str">'Priya Nair'</span>,     <span class="num">190</span>,<span class="num">7</span>,<span class="str">'Pass'</span>,        <span class="str">'2024-01-15 15:00'</span>),
-(<span class="num">6</span>,<span class="str">'Anup Das'</span>,       <span class="num">500</span>,<span class="num">5</span>,<span class="str">'Pass'</span>,        <span class="str">'2024-02-01 23:00'</span>),
-(<span class="num">7</span>,<span class="str">'Rajan Mehta'</span>,   <span class="num">4800</span>,<span class="num">144</span>,<span class="str">'Fail'</span>,       <span class="str">'2024-02-06 07:00'</span>),
-(<span class="num">8</span>,<span class="str">'Priya Nair'</span>,      <span class="num">80</span>,<span class="num">0</span>,<span class="str">'Pass'</span>,        <span class="str">'2024-02-10 15:00'</span>),
-(<span class="num">9</span>,<span class="str">'Anup Das'</span>,       <span class="num">430</span>,<span class="num">12</span>,<span class="str">'Pass'</span>,       <span class="str">'2024-03-01 15:00'</span>);
-</div>
-      </div>
-    </div>
-
-    <!-- B2B SALES -->
-    <div class="data-panel" id="panel-b2b">
-      <div class="dataset-info">
-        <div class="dataset-card">
-          <h4>📊 What's included</h4>
-          <p style="margin-top:8px">
-            <span class="tag green">clients</span>
-            <span class="tag green">sales_reps</span>
-            <span class="tag green">deals</span>
-            <span class="tag green">invoices</span>
-            <span class="tag green">follow_ups</span>
-          </p>
-          <p style="margin-top:12px;font-size:13px;color:var(--fg2)">~400 rows of B2B deal pipeline and invoicing data across 3 sales territories.</p>
-        </div>
-        <div class="dataset-card">
-          <h4>💡 Try asking</h4>
-          <p style="margin-top:8px;font-size:13px;color:var(--fg2)">
-            "Which sales rep closed the most deals this quarter?"<br/><br/>
-            "Show all overdue invoices above ₹1 lakh"<br/><br/>
-            "What is the average deal size by industry?"
-          </p>
-        </div>
-      </div>
-
-      <div class="sql-box">
-        <div class="sql-header">
-          <div class="sql-header-left">
-            <div class="file-dot" style="background:#ef4444"></div>
-            <div class="file-dot" style="background:#f59e0b"></div>
-            <div class="file-dot" style="background:#10b981"></div>
-            &nbsp; b2b_sales_demo.sql
+        <div class="product-visual" aria-label="Qurio Desktop app preview">
+          <div class="window-bar">
+            <div class="window-dots"><span></span><span></span><span></span></div>
+            <div class="window-title">Qurio Desktop</div>
+            <div style="width:52px"></div>
           </div>
-          <button class="copy-btn" onclick="copySQL('b2b-sql')">Copy SQL</button>
-        </div>
-        <div class="sql-body" id="b2b-sql"><span class="cm">-- ═══════════════════════════════════════════════════════
--- DataLens AI — B2B Sales Demo Data
--- Paste this entire script into MySQL Workbench or DBeaver
--- ═══════════════════════════════════════════════════════</span>
-
-<span class="kw">CREATE DATABASE IF NOT EXISTS</span> datalens_b2b_demo;
-<span class="kw">USE</span> datalens_b2b_demo;
-
-<span class="cm">-- ── Sales Reps ────────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> sales_reps (
-  id         <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  name       <span class="fn">VARCHAR</span>(<span class="num">80</span>),
-  territory  <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  target     <span class="fn">DECIMAL</span>(<span class="num">12,2</span>)
-);
-
-<span class="kw">INSERT INTO</span> sales_reps (name, territory, target) <span class="kw">VALUES</span>
-(<span class="str">'Arjun Sharma'</span>,  <span class="str">'North India'</span>,  <span class="num">5000000</span>),
-(<span class="str">'Divya Pillai'</span>,  <span class="str">'South India'</span>,  <span class="num">4500000</span>),
-(<span class="str">'Karan Malhotra'</span>,<span class="str">'West India'</span>,   <span class="num">4000000</span>),
-(<span class="str">'Sneha Roy'</span>,     <span class="str">'East India'</span>,   <span class="num">3500000</span>);
-
-<span class="cm">-- ── Clients ───────────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> clients (
-  id           <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  company_name <span class="fn">VARCHAR</span>(<span class="num">120</span>),
-  industry     <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  city         <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  annual_spend <span class="fn">DECIMAL</span>(<span class="num">12,2</span>),
-  rep_id       <span class="fn">INT</span> <span class="kw">REFERENCES</span> sales_reps(id)
-);
-
-<span class="kw">INSERT INTO</span> clients (company_name,industry,city,annual_spend,rep_id) <span class="kw">VALUES</span>
-(<span class="str">'Bharat Steel Ltd'</span>,        <span class="str">'Manufacturing'</span>,<span class="str">'Delhi'</span>,    <span class="num">1200000</span>,<span class="num">1</span>),
-(<span class="str">'Apex Auto Parts'</span>,         <span class="str">'Automotive'</span>,   <span class="str">'Pune'</span>,     <span class="num">980000</span>, <span class="num">3</span>),
-(<span class="str">'Greenfield Agro'</span>,         <span class="str">'Agriculture'</span>,  <span class="str">'Nagpur'</span>,   <span class="num">560000</span>, <span class="num">3</span>),
-(<span class="str">'TechVision Systems'</span>,      <span class="str">'IT Services'</span>,  <span class="str">'Bangalore'</span>,<span class="num">1450000</span>,<span class="num">2</span>),
-(<span class="str">'Coastal Pharma'</span>,          <span class="str">'Pharma'</span>,       <span class="str">'Chennai'</span>,  <span class="num">720000</span>, <span class="num">2</span>),
-(<span class="str">'Eastern Logistics Co'</span>,    <span class="str">'Logistics'</span>,    <span class="str">'Kolkata'</span>,  <span class="num">430000</span>, <span class="num">4</span>),
-(<span class="str">'IndoTex Garments'</span>,        <span class="str">'Textile'</span>,      <span class="str">'Surat'</span>,    <span class="num">310000</span>, <span class="num">3</span>),
-(<span class="str">'Shree Construction Group'</span>,<span class="str">'Construction'</span>, <span class="str">'Mumbai'</span>,   <span class="num">890000</span>, <span class="num">3</span>);
-
-<span class="cm">-- ── Deals ────────────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> deals (
-  id         <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  client_id  <span class="fn">INT</span> <span class="kw">REFERENCES</span> clients(id),
-  rep_id     <span class="fn">INT</span> <span class="kw">REFERENCES</span> sales_reps(id),
-  title      <span class="fn">VARCHAR</span>(<span class="num">150</span>),
-  value      <span class="fn">DECIMAL</span>(<span class="num">12,2</span>),
-  stage      <span class="fn">ENUM</span>(<span class="str">'Lead'</span>,<span class="str">'Proposal'</span>,<span class="str">'Negotiation'</span>,<span class="str">'Closed Won'</span>,<span class="str">'Closed Lost'</span>),
-  created_at <span class="fn">DATE</span>,
-  closed_at  <span class="fn">DATE</span>
-);
-
-<span class="kw">INSERT INTO</span> deals (client_id,rep_id,title,value,stage,created_at,closed_at) <span class="kw">VALUES</span>
-(<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Annual steel procurement contract'</span>,   <span class="num">1200000</span>,<span class="str">'Closed Won'</span>, <span class="str">'2024-01-05'</span>,<span class="str">'2024-01-28'</span>),
-(<span class="num">2</span>,<span class="num">3</span>,<span class="str">'Brake component supply deal'</span>,          <span class="num">650000</span>, <span class="str">'Closed Won'</span>, <span class="str">'2024-01-10'</span>,<span class="str">'2024-02-15'</span>),
-(<span class="num">3</span>,<span class="num">3</span>,<span class="str">'Agri equipment parts Q1'</span>,              <span class="num">280000</span>, <span class="str">'Closed Won'</span>, <span class="str">'2024-01-15'</span>,<span class="str">'2024-02-01'</span>),
-(<span class="num">4</span>,<span class="num">2</span>,<span class="str">'IT hardware refresh programme'</span>,        <span class="num">1450000</span>,<span class="str">'Closed Won'</span>, <span class="str">'2024-02-01'</span>,<span class="str">'2024-03-10'</span>),
-(<span class="num">5</span>,<span class="num">2</span>,<span class="str">'Lab equipment procurement'</span>,            <span class="num">720000</span>, <span class="str">'Negotiation'</span>,<span class="str">'2024-02-10'</span>,<span class="kw">NULL</span>),
-(<span class="num">6</span>,<span class="num">4</span>,<span class="str">'Fleet tracking software subscription'</span>, <span class="num">180000</span>, <span class="str">'Proposal'</span>,   <span class="str">'2024-02-20'</span>,<span class="kw">NULL</span>),
-(<span class="num">7</span>,<span class="num">3</span>,<span class="str">'Fabric machinery parts annual'</span>,         <span class="num">310000</span>, <span class="str">'Closed Won'</span>, <span class="str">'2024-03-01'</span>,<span class="str">'2024-03-25'</span>),
-(<span class="num">8</span>,<span class="num">3</span>,<span class="str">'Construction equipment services'</span>,       <span class="num">890000</span>, <span class="str">'Closed Won'</span>, <span class="str">'2024-03-05'</span>,<span class="str">'2024-04-02'</span>),
-(<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Stainless steel Q2 batch'</span>,              <span class="num">420000</span>, <span class="str">'Closed Lost'</span>,<span class="str">'2024-03-10'</span>,<span class="str">'2024-04-01'</span>),
-(<span class="num">4</span>,<span class="num">2</span>,<span class="str">'Cloud infrastructure deal'</span>,             <span class="num">800000</span>, <span class="str">'Lead'</span>,        <span class="str">'2024-04-01'</span>,<span class="kw">NULL</span>);
-
-<span class="cm">-- ── Invoices ─────────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> invoices (
-  id         <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  deal_id    <span class="fn">INT</span> <span class="kw">REFERENCES</span> deals(id),
-  client_id  <span class="fn">INT</span> <span class="kw">REFERENCES</span> clients(id),
-  amount     <span class="fn">DECIMAL</span>(<span class="num">12,2</span>),
-  status     <span class="fn">ENUM</span>(<span class="str">'Paid'</span>,<span class="str">'Pending'</span>,<span class="str">'Overdue'</span>),
-  due_date   <span class="fn">DATE</span>,
-  paid_date  <span class="fn">DATE</span>
-);
-
-<span class="kw">INSERT INTO</span> invoices (deal_id,client_id,amount,status,due_date,paid_date) <span class="kw">VALUES</span>
-(<span class="num">1</span>,<span class="num">1</span>,<span class="num">600000</span>, <span class="str">'Paid'</span>,   <span class="str">'2024-02-15'</span>,<span class="str">'2024-02-10'</span>),
-(<span class="num">1</span>,<span class="num">1</span>,<span class="num">600000</span>, <span class="str">'Paid'</span>,   <span class="str">'2024-03-15'</span>,<span class="str">'2024-03-12'</span>),
-(<span class="num">2</span>,<span class="num">2</span>,<span class="num">650000</span>, <span class="str">'Paid'</span>,   <span class="str">'2024-03-01'</span>,<span class="str">'2024-02-28'</span>),
-(<span class="num">3</span>,<span class="num">3</span>,<span class="num">280000</span>, <span class="str">'Paid'</span>,   <span class="str">'2024-02-20'</span>,<span class="str">'2024-02-18'</span>),
-(<span class="num">4</span>,<span class="num">4</span>,<span class="num">725000</span>, <span class="str">'Paid'</span>,   <span class="str">'2024-04-01'</span>,<span class="str">'2024-03-30'</span>),
-(<span class="num">4</span>,<span class="num">4</span>,<span class="num">725000</span>, <span class="str">'Pending'</span>,<span class="str">'2024-05-01'</span>,<span class="kw">NULL</span>),
-(<span class="num">7</span>,<span class="num">7</span>,<span class="num">310000</span>, <span class="str">'Overdue'</span>,<span class="str">'2024-04-15'</span>,<span class="kw">NULL</span>),
-(<span class="num">8</span>,<span class="num">8</span>,<span class="num">445000</span>, <span class="str">'Pending'</span>,<span class="str">'2024-05-10'</span>,<span class="kw">NULL</span>),
-(<span class="num">8</span>,<span class="num">8</span>,<span class="num">445000</span>, <span class="str">'Overdue'</span>,<span class="str">'2024-04-25'</span>,<span class="kw">NULL</span>);
-</div>
-      </div>
-    </div>
-
-    <!-- INVENTORY -->
-    <div class="data-panel" id="panel-inv">
-      <div class="dataset-info">
-        <div class="dataset-card">
-          <h4>📊 What's included</h4>
-          <p style="margin-top:8px">
-            <span class="tag green">warehouses</span>
-            <span class="tag green">sku_catalog</span>
-            <span class="tag green">stock_levels</span>
-            <span class="tag green">stock_movements</span>
-            <span class="tag green">suppliers</span>
-          </p>
-          <p style="margin-top:12px;font-size:13px;color:var(--fg2)">~450 rows of warehouse and inventory management data across 3 locations.</p>
-        </div>
-        <div class="dataset-card">
-          <h4>💡 Try asking</h4>
-          <p style="margin-top:8px;font-size:13px;color:var(--fg2)">
-            "Which items are below reorder level right now?"<br/><br/>
-            "Show total stock value by warehouse"<br/><br/>
-            "Which supplier has delivered the most items this month?"
-          </p>
-        </div>
-      </div>
-
-      <div class="sql-box">
-        <div class="sql-header">
-          <div class="sql-header-left">
-            <div class="file-dot" style="background:#ef4444"></div>
-            <div class="file-dot" style="background:#f59e0b"></div>
-            <div class="file-dot" style="background:#10b981"></div>
-            &nbsp; inventory_demo.sql
-          </div>
-          <button class="copy-btn" onclick="copySQL('inv-sql')">Copy SQL</button>
-        </div>
-        <div class="sql-body" id="inv-sql"><span class="cm">-- ═══════════════════════════════════════════════════════
--- DataLens AI — Inventory Demo Data
--- Paste this entire script into MySQL Workbench or DBeaver
--- ═══════════════════════════════════════════════════════</span>
-
-<span class="kw">CREATE DATABASE IF NOT EXISTS</span> datalens_inventory_demo;
-<span class="kw">USE</span> datalens_inventory_demo;
-
-<span class="cm">-- ── Warehouses ───────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> warehouses (
-  id       <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  name     <span class="fn">VARCHAR</span>(<span class="num">80</span>),
-  city     <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  capacity <span class="fn">INT</span>
-);
-<span class="kw">INSERT INTO</span> warehouses (name,city,capacity) <span class="kw">VALUES</span>
-(<span class="str">'Main Warehouse'</span>,  <span class="str">'Mumbai'</span>,   <span class="num">50000</span>),
-(<span class="str">'North Hub'</span>,       <span class="str">'Delhi'</span>,    <span class="num">30000</span>),
-(<span class="str">'South Depot'</span>,     <span class="str">'Chennai'</span>,  <span class="num">20000</span>);
-
-<span class="cm">-- ── Suppliers ─────────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> suppliers (
-  id           <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  company_name <span class="fn">VARCHAR</span>(<span class="num">100</span>),
-  contact      <span class="fn">VARCHAR</span>(<span class="num">80</span>),
-  lead_days    <span class="fn">INT</span>
-);
-<span class="kw">INSERT INTO</span> suppliers (company_name,contact,lead_days) <span class="kw">VALUES</span>
-(<span class="str">'Paramount Raw Materials'</span>, <span class="str">'rajesh@paramount.in'</span>,  <span class="num">7</span>),
-(<span class="str">'Hindustan Components'</span>,    <span class="str">'sales@hindcomp.com'</span>,   <span class="num">10</span>),
-(<span class="str">'Global Packaging Co'</span>,     <span class="str">'orders@globalpkg.in'</span>,  <span class="num">5</span>);
-
-<span class="cm">-- ── SKU Catalog ───────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> sku_catalog (
-  id             <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  sku_code       <span class="fn">VARCHAR</span>(<span class="num">30</span>) <span class="kw">UNIQUE</span>,
-  name           <span class="fn">VARCHAR</span>(<span class="num">120</span>),
-  category       <span class="fn">VARCHAR</span>(<span class="num">60</span>),
-  unit_price     <span class="fn">DECIMAL</span>(<span class="num">10,2</span>),
-  reorder_level  <span class="fn">INT</span>,
-  supplier_id    <span class="fn">INT</span> <span class="kw">REFERENCES</span> suppliers(id)
-);
-<span class="kw">INSERT INTO</span> sku_catalog (sku_code,name,category,unit_price,reorder_level,supplier_id) <span class="kw">VALUES</span>
-(<span class="str">'RM-STEEL-001'</span>, <span class="str">'Cold Rolled Steel Sheet 1mm'</span>,   <span class="str">'Raw Material'</span>, <span class="num">280.00</span>,  <span class="num">500</span>, <span class="num">1</span>),
-(<span class="str">'RM-ALUM-002'</span>,  <span class="str">'Aluminium Bar 50mm dia'</span>,         <span class="str">'Raw Material'</span>, <span class="num">420.00</span>,  <span class="num">200</span>, <span class="num">1</span>),
-(<span class="str">'CP-BOLT-M10'</span>,  <span class="str">'M10 Hex Bolt Stainless'</span>,         <span class="str">'Components'</span>,   <span class="num">8.50</span>,  <span class="num">5000</span>, <span class="num">2</span>),
-(<span class="str">'CP-BEAR-6204'</span>, <span class="str">'Deep Groove Ball Bearing 6204'</span>,   <span class="str">'Components'</span>,  <span class="num">145.00</span>,  <span class="num">300</span>, <span class="num">2</span>),
-(<span class="str">'PK-BOX-LRG'</span>,   <span class="str">'Corrugated Export Box Large'</span>,    <span class="str">'Packaging'</span>,   <span class="num">38.00</span>,  <span class="num">2000</span>, <span class="num">3</span>),
-(<span class="str">'PK-PAL-STD'</span>,   <span class="str">'Standard Wooden Pallet'</span>,         <span class="str">'Packaging'</span>,  <span class="num">480.00</span>,   <span class="num">100</span>, <span class="num">3</span>),
-(<span class="str">'CP-SEAL-V25'</span>,  <span class="str">'V-Ring Shaft Seal 25mm'</span>,         <span class="str">'Components'</span>,  <span class="num">62.00</span>,   <span class="num">400</span>, <span class="num">2</span>),
-(<span class="str">'RM-COPP-003'</span>,  <span class="str">'Copper Wire 2.5mm (per kg)'</span>,     <span class="str">'Raw Material'</span>, <span class="num">890.00</span>,  <span class="num">150</span>, <span class="num">1</span>);
-
-<span class="cm">-- ── Stock Levels ──────────────────────────────────────</span>
-<span class="kw">CREATE TABLE</span> stock_levels (
-  id            <span class="fn">INT</span> <span class="kw">PRIMARY KEY AUTO_INCREMENT</span>,
-  sku_id        <span class="fn">INT</span> <span class="kw">REFERENCES</span> sku_catalog(id),
-  warehouse_id  <span class="fn">INT</span> <span class="kw">REFERENCES</span> warehouses(id),
-  qty_on_hand   <span class="fn">INT</span>,
-  qty_reserved  <span class="fn">INT</span>,
-  last_updated  <span class="fn">DATETIME</span>
-);
-<span class="kw">INSERT INTO</span> stock_levels (sku_id,warehouse_id,qty_on_hand,qty_reserved,last_updated) <span class="kw">VALUES</span>
-(<span class="num">1</span>,<span class="num">1</span>,<span class="num">820</span>, <span class="num">200</span>,<span class="str">'2024-04-01 09:00'</span>),
-(<span class="num">2</span>,<span class="num">1</span>,<span class="num">195</span>,  <span class="num">50</span>,<span class="str">'2024-04-01 09:00'</span>),   <span class="cm">-- below reorder</span>
-(<span class="num">3</span>,<span class="num">1</span>,<span class="num">8200</span>,<span class="num">1000</span>,<span class="str">'2024-04-01 09:00'</span>),
-(<span class="num">4</span>,<span class="num">2</span>,<span class="num">280</span>,  <span class="num">80</span>,<span class="str">'2024-04-01 09:00'</span>),
-(<span class="num">5</span>,<span class="num">1</span>,<span class="num">3400</span>, <span class="num">800</span>,<span class="str">'2024-04-01 09:00'</span>),
-(<span class="num">6</span>,<span class="num">3</span>,<span class="num">88</span>,   <span class="num">20</span>,<span class="str">'2024-04-01 09:00'</span>),   <span class="cm">-- below reorder</span>
-(<span class="num">7</span>,<span class="num">2</span>,<span class="num">390</span>,  <span class="num">0</span>, <span class="str">'2024-04-01 09:00'</span>),
-(<span class="num">8</span>,<span class="num">1</span>,<span class="num">130</span>,  <span class="num">30</span>,<span class="str">'2024-04-01 09:00'</span>);   <span class="cm">-- below reorder</span>
-</div>
-      </div>
-    </div>
-
-    <div class="download-bar">
-      <div>
-        <h3>Download all 3 datasets</h3>
-        <p>Complete SQL files ready to load — manufacturing, B2B sales, and inventory</p>
-      </div>
-      <div class="dl-btns">
-        <button class="dl-btn" onclick="downloadSQL('mfg')">⬇ Manufacturing</button>
-        <button class="dl-btn" onclick="downloadSQL('b2b')">⬇ B2B Sales</button>
-        <button class="dl-btn" onclick="downloadSQL('inv')">⬇ Inventory</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider" style="max-width:1100px"></div>
-
-<!-- ── SETUP GUIDE ───────────────────────────────────── -->
-<section class="section-pad" id="setup-guide">
-  <div class="container">
-    <div class="section-label">Step-by-step guide</div>
-    <div class="section-title">How to load the demo data</div>
-    <p class="section-sub">Follow these steps exactly — no technical experience needed. It takes about 5 minutes.</p>
-
-    <div class="steps-grid">
-
-      <!-- STEP 1 -->
-      <div class="step-row">
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div class="step-circle">1</div>
-        </div>
-        <div class="step-content">
-          <h3>Install MySQL (if you haven't already)</h3>
-          <p>MySQL is the database software that stores the data on your computer. Download the free Community version.</p>
-
-          <div class="os-tabs">
-            <button class="os-tab active" onclick="switchOS('win', this)">🪟 Windows</button>
-            <button class="os-tab" onclick="switchOS('mac', this)">🍎 macOS</button>
-          </div>
-          <div class="os-content active" id="os-win">
-            <p>1. Go to <strong style="color:var(--blue2)">mysql.com/downloads</strong> → choose <em>MySQL Community Server</em></p>
-            <p>2. Download the Windows Installer (MSI) — the big blue button</p>
-            <p>3. Run the installer → choose <strong>"Developer Default"</strong> → click Next on every screen</p>
-            <p>4. When it asks for a password — <strong>write it down!</strong> You'll need it in Step 3</p>
-            <div class="success-box">✅ MySQL runs automatically in the background after installation. No extra steps needed.</div>
-          </div>
-          <div class="os-content" id="os-mac">
-            <p>1. Go to <strong style="color:var(--blue2)">mysql.com/downloads</strong> → choose <em>MySQL Community Server</em></p>
-            <p>2. Download the macOS DMG package</p>
-            <p>3. Open the DMG → follow the installer → set a root password when asked</p>
-            <p>4. After install: go to System Settings → MySQL → click <strong>Start MySQL Server</strong></p>
-            <div class="warning-box">⚠️ If you skip the password step, use an empty password when connecting later.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STEP 2 -->
-      <div class="step-row">
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div class="step-circle">2</div>
-        </div>
-        <div class="step-content">
-          <h3>Install a database viewer (DBeaver — free)</h3>
-          <p>DBeaver is a free tool that lets you see and manage your database with a simple visual interface. Think of it like Excel for databases.</p>
-          <p>1. Go to <strong style="color:var(--blue2)">dbeaver.io</strong> → click <strong>Download</strong> → choose the free Community Edition</p>
-          <p>2. Install it like any normal app</p>
-          <p>3. Open DBeaver → when asked to create a new connection → choose <strong>MySQL</strong> → enter:</p>
-          <div class="mini-sql">Host:     localhost
-Port:     3306
-Username: root
-Password: (the password you set in Step 1)</div>
-          <p>4. Click <strong>Test Connection</strong> — if it shows a green tick, you're connected!</p>
-          <div class="info-box">💡 If you see a "driver missing" message, click Download and DBeaver will handle it automatically.</div>
-        </div>
-      </div>
-
-      <!-- STEP 3 -->
-      <div class="step-row">
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div class="step-circle">3</div>
-        </div>
-        <div class="step-content">
-          <h3>Load the demo data</h3>
-          <p>Now you'll copy the SQL script from above and run it inside DBeaver. This creates the database and fills it with sample data.</p>
-          <p>1. Go back to the <strong>Demo Data</strong> section above and pick your dataset (Manufacturing, B2B, or Inventory)</p>
-          <p>2. Click the <strong>"Copy SQL"</strong> button — the entire script is now copied</p>
-          <p>3. In DBeaver → click the <strong>SQL Editor</strong> tab at the top → click <strong>New SQL Script</strong></p>
-          <p>4. Click inside the blank editor area and press <span class="inline-code">Ctrl+V</span> (Windows) or <span class="inline-code">Cmd+V</span> (Mac) to paste</p>
-          <p>5. Press <span class="inline-code">Ctrl+Alt+Enter</span> (Windows) or <span class="inline-code">Cmd+Enter</span> (Mac) to run all the SQL</p>
-          <div class="success-box">✅ You should see "Script executed successfully" in the bottom panel. Your demo database is now ready!</div>
-          <div class="warning-box">⚠️ If you see an error about "database already exists" — that just means you ran it before. It's fine, continue.</div>
-        </div>
-      </div>
-
-      <!-- STEP 4 -->
-      <div class="step-row" style="padding-bottom:0">
-        <div style="display:flex;flex-direction:column;align-items:center">
-          <div class="step-circle">4</div>
-        </div>
-        <div class="step-content">
-          <h3>Verify the data is there</h3>
-          <p>Before connecting the software, quickly check the data loaded correctly.</p>
-          <p>In DBeaver on the left panel, expand: <span class="inline-code">localhost</span> → <span class="inline-code">Databases</span> → you should see your new database (e.g. <span class="inline-code">datalens_manufacturing_demo</span>)</p>
-          <p>Expand it → click on any table (e.g. <span class="inline-code">machines</span>) → click the <strong>Data</strong> tab → you should see rows of sample data.</p>
-          <div class="success-box">✅ If you can see data in the table rows — you're ready to connect DataLens AI!</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<div class="divider" style="max-width:1100px"></div>
-
-<!-- ── CONNECT SECTION ───────────────────────────────── -->
-<section class="section-pad" id="connect">
-  <div class="container">
-    <div class="section-label">Connect to DataLens AI</div>
-    <div class="section-title">Link your database to the software</div>
-    <p class="section-sub">Open DataLens AI on your machine. On the database setup screen, enter exactly these values:</p>
-
-    <div class="connect-grid">
-      <div>
-        <div class="connect-fields">
-          <div class="field-row">
-            <div class="field-group">
-              <div class="field-label">Host</div>
-              <div class="field-mock highlight">
-                <span class="icon">🖥</span>
-                <span class="val">localhost</span>
+          <div class="app-preview">
+            <aside class="sidebar">
+              <div class="side-title">Workspace</div>
+              <div class="side-item active"><span class="mini-icon"></span>Ask AI</div>
+              <div class="side-item"><span class="mini-icon"></span>Dashboard</div>
+              <div class="side-item"><span class="mini-icon"></span>Reports</div>
+              <div class="side-item"><span class="mini-icon"></span>Data Sources</div>
+              <div class="side-item"><span class="mini-icon"></span>Settings</div>
+            </aside>
+            <div class="main-preview">
+              <div class="preview-head">
+                <div>
+                  <h2>Ask your business data</h2>
+                  <p>Connected to local manufacturing demo database</p>
+                </div>
+                <div class="secure-pill"><span class="status-dot"></span> Local data source</div>
               </div>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Port</div>
-              <div class="field-mock highlight">
-                <span class="icon">#</span>
-                <span class="val">3306</span>
+
+              <div class="metric-grid">
+                <div class="metric"><span>Revenue</span><strong>Rs. 84.2L</strong></div>
+                <div class="metric"><span>Orders</span><strong>1,284</strong></div>
+                <div class="metric"><span>Low Stock</span><strong>16</strong></div>
+                <div class="metric"><span>Uptime</span><strong>94%</strong></div>
               </div>
-            </div>
-          </div>
-          <div class="field-group">
-            <div class="field-label">Database Name</div>
-            <div class="field-mock highlight">
-              <span class="icon">🗄</span>
-              <span class="val" id="dbname-display">datalens_manufacturing_demo</span>
-            </div>
-          </div>
-          <div class="field-row">
-            <div class="field-group">
-              <div class="field-label">Username (Optional)</div>
-              <div class="field-mock">
-                <span class="icon">👤</span>
-                <span class="val">root</span>
-              </div>
-            </div>
-            <div class="field-group">
-              <div class="field-label">Password (Optional)</div>
-              <div class="field-mock">
-                <span class="icon">🔒</span>
-                <span style="color:var(--fg3)">your MySQL password</span>
+
+              <div class="query-panel">
+                <div class="query-input">Which product line had the highest revenue this quarter?</div>
+                <div class="result-area">
+                  <div class="sql">
+SELECT product_line, SUM(revenue) AS total_revenue<br>
+FROM sales_orders<br>
+WHERE order_date &gt;= CURRENT_DATE - INTERVAL '90 days'<br>
+GROUP BY product_line<br>
+ORDER BY total_revenue DESC<br>
+LIMIT 5;
+                  </div>
+                  <div class="chart" aria-hidden="true">
+                    <div class="bar" style="height: 45%"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="dl-btn" onclick="setDb('manufacturing')">🏭 Manufacturing DB</button>
-          <button class="dl-btn" onclick="setDb('b2b')">🤝 B2B Sales DB</button>
-          <button class="dl-btn" onclick="setDb('inventory')">📦 Inventory DB</button>
+    <section id="product">
+      <div class="shell">
+        <div class="section-kicker">What clients get</div>
+        <h2 class="section-title">A ready desktop analytics assistant customized for their data workflow</h2>
+        <p class="section-lead">
+          The demo shows the core experience. A client version can include branded UI, selected database connectors, saved dashboards, user access, and a changeable Groq API key.
+        </p>
+
+        <div class="grid-3">
+          <article class="card">
+            <div class="card-badge">1</div>
+            <h3>Ask in plain English</h3>
+            <p>Users type business questions and the system generates safe read-only SQL for the connected data source.</p>
+          </article>
+          <article class="card">
+            <div class="card-badge">2</div>
+            <h3>Connect common data sources</h3>
+            <p>Supports MySQL, PostgreSQL, SQLite, CSV, and Excel demos, with encrypted local connection settings.</p>
+          </article>
+          <article class="card">
+            <div class="card-badge">3</div>
+            <h3>Package as client software</h3>
+            <p>Installer, app name, logo, company copy, database setup, and AI configuration can be prepared per client.</p>
+          </article>
         </div>
       </div>
+    </section>
 
-      <div class="check-list">
-        <div style="font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:8px">What happens next:</div>
-        <div class="check-item">
-          <div class="check-icon">✓</div>
-          <div>Click <strong>Test Connection</strong> — DataLens will verify it can reach your database</div>
+    <section class="download-section" id="download">
+      <div class="shell">
+        <div class="section-kicker">Demo download</div>
+        <h2 class="section-title">Let clients try the desktop app before a custom build</h2>
+        <p class="section-lead">
+          Share this page with clients so they can download the Windows demo, install it locally, connect sample data, and evaluate the workflow.
+        </p>
+
+        <div class="download-panel">
+          <div class="download-copy">
+            <h3>What is included in the demo</h3>
+            <ul class="download-list">
+              <li><span class="check">OK</span><span>Windows desktop app installer for evaluation.</span></li>
+              <li><span class="check">OK</span><span>Admin login, data-source setup, Ask AI, dashboard, reports, and settings screens.</span></li>
+              <li><span class="check">OK</span><span>Groq API key can be updated from Settings without rebuilding the software.</span></li>
+              <li><span class="check">OK</span><span>Client builds can be branded and configured after approval.</span></li>
+            </ul>
+          </div>
+
+          <aside class="download-card">
+            <h3>Download demo</h3>
+            <p class="tiny">Upload the installer as a GitHub Release asset named <code>Qurio-Demo-Setup.exe</code>. This page always downloads the latest release asset.</p>
+            <div class="file-box">
+              <div class="file-name">Qurio Demo Setup</div>
+              <div class="file-meta">Windows installer | GitHub latest release | Evaluation build</div>
+            </div>
+            <a class="btn btn-primary" href="https://github.com/BlackDevil9678/landing/releases/latest/download/Qurio-Demo-Setup.exe" data-download>Download Installer</a>
+            <p class="tiny">If Windows SmartScreen appears, choose More info, then Run anyway. Code signing can be added for production client builds.</p>
+          </aside>
         </div>
-        <div class="check-item">
-          <div class="check-icon">✓</div>
-          <div>Click <strong>Save & Continue</strong> — the software reads your database structure automatically</div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <div class="shell">
+        <div class="section-kicker">Simple evaluation flow</div>
+        <h2 class="section-title">From installer to first AI query in minutes</h2>
+        <div class="steps">
+          <article class="step">
+            <h3>Install the app</h3>
+            <p>Download the Windows demo installer and complete the desktop installation.</p>
+          </article>
+          <article class="step">
+            <h3>Sign in as admin</h3>
+            <p>Use the provided demo credentials, then change them before any real client deployment.</p>
+          </article>
+          <article class="step">
+            <h3>Add AI key and data</h3>
+            <p>Open Settings to add the Groq key and connect a demo database or file.</p>
+          </article>
+          <article class="step">
+            <h3>Ask questions</h3>
+            <p>Ask business questions and review generated SQL, tables, and dashboard summaries.</p>
+          </article>
         </div>
-        <div class="check-item">
-          <div class="check-icon">✓</div>
-          <div>You'll land on the dashboard — it will already show summary stats from the demo data</div>
+      </div>
+    </section>
+
+    <section id="security">
+      <div class="shell">
+        <div class="section-kicker">Built for client confidence</div>
+        <h2 class="section-title">Security details clients usually ask about</h2>
+        <p class="section-lead">
+          The demo is designed for local evaluation. Production client deployments should use a client-owned AI key, signed installers, and client-specific branding.
+        </p>
+
+        <div class="security-grid">
+          <article class="security-card">
+            <h3>Local app storage</h3>
+            <p>App configuration and connection settings are stored locally on the client machine. Sensitive values are encrypted with per-install secrets.</p>
+          </article>
+          <article class="security-card">
+            <h3>Read-only SQL guardrails</h3>
+            <p>The backend blocks destructive SQL keywords and only permits SELECT queries for the AI query workflow.</p>
+          </article>
+          <article class="security-card">
+            <h3>Admin-controlled setup</h3>
+            <p>Database setup, AI key configuration, and user management are protected behind authenticated admin access.</p>
+          </article>
+          <article class="security-card">
+            <h3>Custom client builds</h3>
+            <p>Each client can receive a separate branded build with their app name, logo, data source, and AI provider settings.</p>
+          </article>
         </div>
-        <div class="check-item">
-          <div class="check-icon">✓</div>
-          <div>Go to <strong>Ask AI</strong> and type any question about the data in plain English</div>
-        </div>
-        <div class="check-item">
-          <div class="check-icon">✓</div>
-          <div>When ready, connect your real company database — just change the database name</div>
-        </div>
-        <div style="margin-top:20px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:10px;padding:16px">
-          <div style="font-size:13px;color:#34d399;font-weight:600;margin-bottom:6px">🔒 Your data never leaves your machine</div>
-          <div style="font-size:13px;color:var(--fg2)">DataLens AI connects directly to your local MySQL. Your data is never uploaded to any server — only your question text is sent to the AI to generate the SQL query.</div>
+      </div>
+    </section>
+
+    <div class="cta">
+      <div class="shell">
+        <h2>Ready to see Qurio on your own business data?</h2>
+        <p>Start with the demo installer, then request a branded client build with your company name, logo, data source, and AI configuration.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://github.com/BlackDevil9678/landing/releases/latest/download/Qurio-Demo-Setup.exe" data-download>Download Demo</a>
+          <a class="btn btn-secondary" href="mailto:hello@example.com?subject=Qurio%20custom%20client%20build">Request Customization</a>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </main>
 
-<div class="divider" style="max-width:1100px"></div>
-
-<!-- ── SAMPLE QUERIES ────────────────────────────────── -->
-<section class="section-pad">
-  <div class="container">
-    <div class="section-label">Try these questions</div>
-    <div class="section-title">Copy and paste into Ask AI</div>
-
-    <div class="query-grid">
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">🏭 Manufacturing</div>
-        <div class="query-text">Which machine had the most downtime hours this month?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">🏭 Manufacturing</div>
-        <div class="query-text">Show me the defect rate for each product line</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">🏭 Manufacturing</div>
-        <div class="query-text">Which orders failed quality check?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">🤝 B2B Sales</div>
-        <div class="query-text">Which sales rep closed the most deal value this quarter?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">🤝 B2B Sales</div>
-        <div class="query-text">Show all overdue invoices and which client owes the most</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">🤝 B2B Sales</div>
-        <div class="query-text">What is the win rate of deals by territory?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">📦 Inventory</div>
-        <div class="query-text">Which items are currently below their reorder level?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">📦 Inventory</div>
-        <div class="query-text">What is the total stock value at each warehouse?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
-      <div class="query-card" onclick="copyQuery(this)">
-        <div class="query-industry">📦 Inventory</div>
-        <div class="query-text">Which supplier provides the most SKUs?</div>
-        <div class="query-tag">Click to copy</div>
-      </div>
+  <footer>
+    <div class="shell footer-row">
+      <a class="brand" href="#top">
+        <span class="brand-mark">Q</span>
+        <span>Qurio</span>
+      </a>
+      <span>Custom AI analytics software for client business data.</span>
     </div>
-  </div>
-</section>
+  </footer>
 
-<!-- ── FOOTER ─────────────────────────────────────────── -->
-<footer>
-  <div class="logo" style="justify-content:center;margin-bottom:12px">
-    <img src="data:image/jpeg;base64,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" style="width:34px;height:34px;border-radius:8px;" alt="DataLens AI logo">
-    DataLens AI
-  </div>
-  <p style="margin-bottom:6px">Your business data. Your machine. Your questions.</p>
-  <p style="color:var(--fg3);font-size:12px">All demo data is completely fictional. © 2024 DataLens AI</p>
-</footer>
+  <div class="toast" id="toast">Download will start if the installer file is available.</div>
 
-<!-- ── TOAST ──────────────────────────────────────────── -->
-<div id="toast" style="
-  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);
-  background:#1c1c2a;border:1px solid rgba(99,102,241,.4);color:var(--fg);
-  padding:12px 24px;border-radius:10px;font-size:14px;
-  transition:transform .3s ease;z-index:200;pointer-events:none
-">✅ Copied!</div>
+  <script>
+    const toast = document.getElementById("toast");
+    let toastTimer;
 
-<script>
-// ── TAB SWITCHING ────────────────────────────────────
-function switchTab(id, btn) {
-  document.querySelectorAll('.data-panel').forEach(p => p.classList.remove('active'))
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  document.getElementById('panel-' + id).classList.add('active')
-  btn.classList.add('active')
-}
-
-// ── OS SWITCHING ─────────────────────────────────────
-function switchOS(os, btn) {
-  document.querySelectorAll('.os-tab').forEach(t => t.classList.remove('active'))
-  document.querySelectorAll('.os-content').forEach(c => c.classList.remove('active'))
-  btn.classList.add('active')
-  document.getElementById('os-' + os).classList.add('active')
-}
-
-// ── COPY SQL ─────────────────────────────────────────
-function copySQL(id) {
-  const el = document.getElementById(id)
-  const text = el.innerText
-  navigator.clipboard.writeText(text).then(() => showToast('SQL copied!'))
-}
-
-// ── COPY QUERY ───────────────────────────────────────
-function copyQuery(card) {
-  const q = card.querySelector('.query-text').innerText
-  navigator.clipboard.writeText(q).then(() => showToast('Question copied!'))
-}
-
-// ── DOWNLOAD SQL ─────────────────────────────────────
-const fileNames = { mfg:'manufacturing_demo.sql', b2b:'b2b_sales_demo.sql', inv:'inventory_demo.sql' }
-const sqlIds    = { mfg:'mfg-sql', b2b:'b2b-sql', inv:'inv-sql' }
-function downloadSQL(key) {
-  const el   = document.getElementById(sqlIds[key])
-  const text = el.innerText
-  const blob = new Blob([text], { type:'text/plain' })
-  const url  = URL.createObjectURL(blob)
-  const a    = document.createElement('a')
-  a.href     = url; a.download = fileNames[key]; a.click()
-  URL.revokeObjectURL(url)
-  showToast('Downloading ' + fileNames[key])
-}
-
-// ── DB NAME SWITCHER ─────────────────────────────────
-const dbNames = {
-  manufacturing: 'datalens_manufacturing_demo',
-  b2b:           'datalens_b2b_demo',
-  inventory:     'datalens_inventory_demo'
-}
-function setDb(key) {
-  document.getElementById('dbname-display').innerText = dbNames[key]
-  showToast('Database name updated!')
-}
-
-// ── TOAST ─────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast')
-  t.innerText = '✅ ' + msg
-  t.style.transform = 'translateX(-50%) translateY(0)'
-  setTimeout(() => { t.style.transform = 'translateX(-50%) translateY(60px)' }, 2500)
-}
-
-// ── TYPEWRITER ANIMATION ─────────────────────────────
-const demos = [
-  {
-    q: 'Which machine had the most downtime this month?',
-    sql: `<span class="kw">SELECT</span> m.machine_name, <span class="fn">SUM</span>(d.hours_lost) <span class="kw">AS</span> total_hours\n<span class="kw">FROM</span> downtime_logs d\n<span class="kw">JOIN</span> machines m <span class="kw">ON</span> d.machine_id = m.id\n<span class="kw">WHERE</span> <span class="fn">MONTH</span>(d.started_at) = <span class="fn">MONTH</span>(<span class="fn">NOW</span>())\n<span class="kw">GROUP BY</span> m.machine_name\n<span class="kw">ORDER BY</span> total_hours <span class="kw">DESC</span>`,
-    rows: [['Press-01','10.00 hrs'],['CNC-Alpha','7.50 hrs'],['Weld-01','2.50 hrs']],
-    heads: ['Machine','Downtime']
-  },
-  {
-    q: 'Which product line had the highest revenue last quarter?',
-    sql: `<span class="kw">SELECT</span> product_line, <span class="fn">SUM</span>(revenue) <span class="kw">AS</span> total_revenue\n<span class="kw">FROM</span> sales_orders\n<span class="kw">WHERE</span> order_date >= <span class="fn">DATE_SUB</span>(<span class="fn">NOW</span>(), <span class="kw">INTERVAL</span> <span class="num">90</span> <span class="kw">DAY</span>)\n<span class="kw">GROUP BY</span> product_line\n<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC LIMIT</span> <span class="num">5</span>`,
-    rows: [['Heavy Machinery','₹ 84,20,000'],['Auto Components','₹ 61,75,500'],['Industrial Tools','₹ 38,90,200']],
-    heads: ['Product Line','Total Revenue']
-  },
-  {
-    q: 'Show all overdue invoices and who owes the most',
-    sql: `<span class="kw">SELECT</span> c.company_name, <span class="fn">SUM</span>(i.amount) <span class="kw">AS</span> total_overdue\n<span class="kw">FROM</span> invoices i\n<span class="kw">JOIN</span> clients c <span class="kw">ON</span> i.client_id = c.id\n<span class="kw">WHERE</span> i.status = <span class="str">'Overdue'</span>\n<span class="kw">GROUP BY</span> c.company_name\n<span class="kw">ORDER BY</span> total_overdue <span class="kw">DESC</span>`,
-    rows: [['Shree Construction','₹ 4,45,000'],['IndoTex Garments','₹ 3,10,000']],
-    heads: ['Company','Amount Overdue']
-  }
-]
-
-let demoIdx = 0
-function runDemo() {
-  const d = demos[demoIdx % demos.length]
-  demoIdx++
-  const qEl  = document.getElementById('tw-q')
-  const sqlEl = document.getElementById('tw-sql')
-  const resEl = document.getElementById('tw-result')
-
-  // Type question
-  qEl.innerHTML = '<span class="tw-cursor"></span>'
-  let i = 0
-  const interval = setInterval(() => {
-    if (i < d.q.length) {
-      qEl.innerHTML = d.q.slice(0, ++i) + '<span class="tw-cursor"></span>'
-    } else {
-      clearInterval(interval)
-      // Show SQL after short delay
-      setTimeout(() => {
-        sqlEl.innerHTML = d.sql
-        // Show result after another delay
-        setTimeout(() => {
-          const thead = `<thead><tr>${d.heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead>`
-          const tbody = `<tbody>${d.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`
-          resEl.innerHTML = thead + tbody
-        }, 700)
-      }, 400)
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
     }
-  }, 38)
-}
 
-runDemo()
-setInterval(runDemo, 8000)
-</script>
+    document.querySelectorAll("[data-download]").forEach((link) => {
+      link.addEventListener("click", () => {
+        showToast("Opening demo installer download...");
+      });
+    });
+  </script>
 </body>
 </html>
