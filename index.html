@@ -567,6 +567,70 @@
       background: #b45309;
     }
 
+    .video-section {
+      background:
+        radial-gradient(circle at 18% 12%, rgba(6, 182, 212, .16), transparent 34%),
+        #0b1018;
+    }
+
+    .video-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+      gap: 28px;
+      align-items: center;
+      margin-top: 36px;
+    }
+
+    .video-frame {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: #05070b;
+      box-shadow: var(--shadow);
+    }
+
+    .video-frame video {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: #05070b;
+    }
+
+    .video-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 16px;
+      border-top: 1px solid var(--line);
+      color: var(--soft);
+      font-size: 13px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .video-points {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .video-points h3 {
+      margin: 0 0 14px;
+      font-size: 21px;
+    }
+
+    .video-points p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .video-points .download-list {
+      margin-top: 0;
+    }
+
     .download-section {
       background: #0f141d;
     }
@@ -798,6 +862,7 @@
       .grid-3,
       .steps,
       .security-grid,
+      .video-layout,
       .download-panel,
       .result-area {
         grid-template-columns: 1fr;
@@ -857,6 +922,7 @@
       </a>
       <div class="navlinks" aria-label="Main navigation">
         <a href="#product">Product</a>
+        <a href="#walkthrough">Walkthrough</a>
         <a href="#download">Download</a>
         <a href="#setup">Setup</a>
         <a href="#security">Security</a>
@@ -876,7 +942,7 @@
           </p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="https://github.com/BlackDevil9678/landing/releases/latest/download/Qurio-Demo-Setup.exe" data-download>Download Windows Demo</a>
-            <a class="btn btn-secondary" href="mailto:hello@example.com?subject=Qurio%20client%20demo">Request Client Build</a>
+            <a class="btn btn-secondary" href="#walkthrough">Watch Walkthrough</a>
           </div>
           <p class="hero-note">Demo installer for evaluation. Client builds can be customized with company name, logo, database, and AI key.</p>
         </div>
@@ -963,6 +1029,39 @@ LIMIT 5;
             <h3>Package as client software</h3>
             <p>Installer, app name, logo, company copy, database setup, and AI configuration can be prepared per client.</p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="video-section" id="walkthrough">
+      <div class="shell">
+        <div class="section-kicker">Product walkthrough</div>
+        <h2 class="section-title">Show clients how Qurio works before they install it</h2>
+        <p class="section-lead">
+          This short walkthrough demonstrates the desktop app flow: opening Qurio, reviewing dashboards, asking AI questions, checking reports, and updating data or AI settings.
+        </p>
+
+        <div class="video-layout">
+          <div class="video-frame">
+            <video controls preload="metadata" poster="assets/images/qurio-walkthrough-poster.jpg">
+              <source src="assets/videos/qurio-walkthrough.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+            <div class="video-caption">
+              <span>Qurio Desktop demo walkthrough</span>
+              <span>4 min 39 sec</span>
+            </div>
+          </div>
+
+          <aside class="video-points">
+            <h3>What the client can see</h3>
+            <p>Use this video when a client wants to understand the workflow before downloading the Windows demo installer.</p>
+            <ul class="download-list">
+              <li><span class="check">OK</span><span>Dashboard and business summary screens.</span></li>
+              <li><span class="check">OK</span><span>Ask AI workflow with generated insight output.</span></li>
+              <li><span class="check">OK</span><span>Reports, settings, data source, and AI key configuration screens.</span></li>
+            </ul>
+          </aside>
         </div>
       </div>
     </section>
